@@ -28,7 +28,7 @@ notNull:{
   msg:"Please Enter an author for the book,"
 }
 }},
-    gnere: DataTypes.STRING,
+    genre: DataTypes.STRING,
     year: DataTypes.STRING
   }, {
     sequelize,

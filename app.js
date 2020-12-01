@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// var usersRouter = require('./routes/users');
 
 var app = express();
 const {sequelize, Book} =require('./models');
@@ -19,10 +19,33 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', async(req, res) => { 
-  const books = await Book.findAll();
-  res.json(books);
-});
+//code found in TeamTreeHouse ORM Express Video
+const asyncHandler=(cb)=>{
+  return async(req,res,next) =>
+  {
+    try {
+      await cb(req, res, next)
+    }
+    catch(error){
+      res.status(500).send(error);
+    }
+  }
+}
+
+app.get('/',asyncHandler( async(req, res) => { 
+  // const books = await Book.findAll();
+  // res.json(books);
+  res.redirect('/books');
+}));
+
+app.get('/books', asyncHandler( async(req,res) =>{
+  const books=await Book.findAll();
+  res.render('index',{books, title: "Books"})
+}));
+
+
+app.get('/books/new', (req,res) => {
+  res.render('new-book', { books:{},title:"New Book"} )});
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);

@@ -30,7 +30,7 @@ sequelize.sync().then( () =>
 {
 
   server.listen(port);
-})
+});
 
 
 server.on('error', onError);

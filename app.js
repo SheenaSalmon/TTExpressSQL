@@ -45,7 +45,27 @@ app.get('/books', asyncHandler( async(req,res) =>{
 
 
 app.get('/books/new', (req,res) => {
-  res.render('new-book', { books:{},title:"New Book"} )});
+  res.render('new-book', { books:{},title:"New Book" ,op:"Submit"} )});
+
+app.post('/books/new',asyncHandler( async(req,res)=>
+{
+    console.log(req.body);
+    newBook=req.body;
+    const books =await Book.create(req.body);
+    //const book = await Book.create({title:newBook.tilet, Author:newBook.author , Genre: newBook.genre, year: newBook.year  });
+
+    res.redirect('/books');
+}));
+
+app.get('/books/:id',asyncHandler ( async(req,res) =>
+{
+  const books = await Book.findByPk(req.params.id);
+  res.render('new-book',{books, op:"Update"})
+})
+
+);
+
+
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);

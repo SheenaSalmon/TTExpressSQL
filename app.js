@@ -69,10 +69,21 @@ app.post('/books/new',asyncHandler( async(req,res)=>
    
 }));
 
-app.get('/books/:id',asyncHandler ( async(req,res) =>
+app.get('/books/:id',asyncHandler ( async(req,res,next) =>
 {
-  const books = await Book.findByPk(req.params.id);
-  res.render('update-book',{books, op:"Update"});
+    const books = await Book.findByPk(req.params.id);
+    if(books)
+      {
+
+      res.render('update-book',{books, op:"Update"});}
+      else{
+        const err =new Error();
+        err.status =404;
+        err.message="Looks Like the Book You are Looking for is Not Available :(";
+        err.name="Your Book Page is Unavailable";
+        res.locals.error =err;
+        res.render('page-not-found');
+      }
 })
 
 );
@@ -92,7 +103,7 @@ app.post('/books/:id', asyncHandler(async (req,res) =>
       res.render('update-book',{books,op:"Update",errors:errors.errors});
     }
     else{
-      throw error;
+    throw error;
     }
   }
 }));
@@ -155,6 +166,15 @@ app.use(function(err, req, res, next) {
   //   err=newerr;    
   // }
   console.log(err);
+  if (err.status === 404)
+  {
+    err.message="Sorry, the file that you requested cannot be found :(";
+    err.name="Page Could Not be Found";
+    
+    res.locals.error=err;
+    res.render('page-not-found');
+  }
+  
    res.status(err.status || 500);
   err.message = err.message ;
   err.name=err.name ;

@@ -49,21 +49,60 @@ app.get('/books/new', (req,res) => {
 
 app.post('/books/new',asyncHandler( async(req,res)=>
 {
-    console.log(req.body);
-    newBook=req.body;
-    const books =await Book.create(req.body);
+    // console.log(req.body);
+    // newBook=req.body;
+    let books;
+      try {   
+        books =await Book.create(req.body);
+        res.redirect('/books');}
+        catch(error)
+        {
+          if( error.name === "SequelizeValidationError")
+          {
+            books=await Book.build(req.body);
+            res.render('new-book',{books, title: "New Book",op:"Submit", errors:error.errors})
+          }
+        }
+        throw(error)
     //const book = await Book.create({title:newBook.tilet, Author:newBook.author , Genre: newBook.genre, year: newBook.year  });
 
-    res.redirect('/books');
+   
 }));
 
 app.get('/books/:id',asyncHandler ( async(req,res) =>
 {
   const books = await Book.findByPk(req.params.id);
-  res.render('new-book',{books, op:"Update"})
+  res.render('update-book',{books, op:"Update"});
 })
 
 );
+
+app.post('/books/:id', asyncHandler(async (req,res) =>
+{
+  let book = await Book.findByPk(req.params.id);
+  //console.log(book);
+ try{book= await book.update(req.body);
+  res.redirect('/books')}
+  catch(error)
+  {
+    if(error.name === "SequelizeValidationError")
+    {
+      const bookid=req.params.id;
+      books = await book.build(req.body);
+      res.render('update-book',{books,op:"Update",errors:errors.errors});
+    }
+    else{
+      throw error;
+    }
+  }
+}));
+
+app.post('/books/:id/delete', asyncHandler( async (req, res) =>
+{
+  const book = await Book.findByPk(req.params.id);
+  await book.destroy();
+  res.redirect('/books')
+}))
 
 
 

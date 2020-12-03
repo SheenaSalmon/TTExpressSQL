@@ -3,5 +3,8 @@ extends layout
 block content
   h1= title
   
-  form(action='/books/new' , method ='post')
-    inclue form
+  form(action=`/books/${books.id}` , method ='post')
+    include form
+  if op == "Update"
+    form(action=`${books.id}/delete` , method='post')
+      input(type="submit" value="Delete") 

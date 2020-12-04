@@ -88,25 +88,63 @@ app.get('/books/:id',asyncHandler ( async(req,res,next) =>
 
 );
 
-app.post('/books/:id', asyncHandler(async (req,res) =>
-{
-  let book = await Book.findByPk(req.params.id);
-  //console.log(book);
- try{book= await book.update(req.body);
-  res.redirect('/books')}
-  catch(error)
-  {
-    if(error.name === "SequelizeValidationError")
+// app.post('/books/:id', asyncHandler(async (req,res,next) =>
+// {
+//   let books = await Book.findByPk(req.params.id);
+//   //console.log(book);
+//  try{
+//    const book= await book.update(req.body);
+//   res.redirect('/books')}
+//   catch(error)
+//   {
+//     if(error.name === "SequelizeValidationError")
+//     {
+//       // const bookid=req.params.id;
+//       // books = await Book.build(req.body);
+//       console.log(books);
+//       res.render('update-book',{books,title:"Update",op:"Update",errors:error.errors});
+//     }
+   
+//   }throw (error)
+// }));
+
+app.post( '/books/:id', asyncHandler( async (req, res) => {
+  let books;
+  try{
+    books= await Book.findByPk(req.params.id);
+    // console.log(books);
+    if(books)
     {
-      const bookid=req.params.id;
-      books = await book.build(req.body);
-      res.render('update-book',{books,op:"Update",errors:errors.errors});
+      await books.update(req.body);
+      res.redirect('/books');
     }
-    else{
-    throw error;
+    else
+    {
+      res.sendStatus(404);
     }
+
   }
+  catch (error){
+    // console.log(error.name);
+    // SequelizeValidationError
+    if(error.name ==="SequelizeValidationError")
+    {
+        console.log("Sequelization Error has occurred right now")
+      //books=await Books.build(req.body);
+      console.log(books.dataValues);
+      books=books.dataValues;
+      // books.id=req.params.id;
+      res.render('update-book',{books, errors:error.errors, title:"Update the Book", op:"Update"});
+    }
+    // else
+    // {
+    //   throw error;
+    // }
+  } throw (error)
 }));
+
+
+
 
 app.post('/books/:id/delete', asyncHandler( async (req, res) =>
 {

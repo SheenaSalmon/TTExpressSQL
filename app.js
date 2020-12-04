@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 
 var app = express();
 const {sequelize, Book} =require('./models');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -32,26 +33,26 @@ const asyncHandler=(cb)=>{
   }
 }
 
+//Redirect from homegage to books
 app.get('/',asyncHandler( async(req, res) => { 
-  // const books = await Book.findAll();
-  // res.json(books);
-  res.redirect('/books');
+    res.redirect('/books');
 }));
 
+//Display the entire books table 
 app.get('/books', asyncHandler( async(req,res) =>{
   const books=await Book.findAll();
   res.render('index',{books, title: "Books"})
 }));
 
 
+//Form to Enter data of the new book
 app.get('/books/new', (req,res) => {
   res.render('new-book', { books:{},title:"New Book" ,op:"Submit"} )});
 
+  //Data for new book is add and then placed in the database
 app.post('/books/new',asyncHandler( async(req,res)=>
 {
-    // console.log(req.body);
-    // newBook=req.body;
-    let books;
+       let books;
       try {   
         books =await Book.create(req.body);
         res.redirect('/books');}
@@ -64,11 +65,10 @@ app.post('/books/new',asyncHandler( async(req,res)=>
           }
         }
         throw(error)
-    //const book = await Book.create({title:newBook.tilet, Author:newBook.author , Genre: newBook.genre, year: newBook.year  });
-
-   
+      
 }));
 
+//Display the Data of the book with the given id,  option to: update,delete and cancel
 app.get('/books/:id',asyncHandler ( async(req,res,next) =>
 {
     const books = await Book.findByPk(req.params.id);
@@ -88,26 +88,7 @@ app.get('/books/:id',asyncHandler ( async(req,res,next) =>
 
 );
 
-// app.post('/books/:id', asyncHandler(async (req,res,next) =>
-// {
-//   let books = await Book.findByPk(req.params.id);
-//   //console.log(book);
-//  try{
-//    const book= await book.update(req.body);
-//   res.redirect('/books')}
-//   catch(error)
-//   {
-//     if(error.name === "SequelizeValidationError")
-//     {
-//       // const bookid=req.params.id;
-//       // books = await Book.build(req.body);
-//       console.log(books);
-//       res.render('update-book',{books,title:"Update",op:"Update",errors:error.errors});
-//     }
-   
-//   }throw (error)
-// }));
-
+//The data is updated
 app.post( '/books/:id', asyncHandler( async (req, res) => {
   let books;
   try{
@@ -125,27 +106,17 @@ app.post( '/books/:id', asyncHandler( async (req, res) => {
 
   }
   catch (error){
-    // console.log(error.name);
-    // SequelizeValidationError
     if(error.name ==="SequelizeValidationError")
     {
         console.log("Sequelization Error has occurred right now")
-      //books=await Books.build(req.body);
-      console.log(books.dataValues);
+           console.log(books.dataValues);
       books=books.dataValues;
-      // books.id=req.params.id;
-      res.render('update-book',{books, errors:error.errors, title:"Update the Book", op:"Update"});
+           res.render('update-book',{books, errors:error.errors, title:"Update the Book", op:"Update"});
     }
-    // else
-    // {
-    //   throw error;
-    // }
-  } throw (error)
+    } throw (error)
 }));
 
-
-
-
+//The book is deleted
 app.post('/books/:id/delete', asyncHandler( async (req, res) =>
 {
   const book = await Book.findByPk(req.params.id);
@@ -153,28 +124,11 @@ app.post('/books/:id/delete', asyncHandler( async (req, res) =>
   res.redirect('/books')
 }))
 
-
-
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
 app.get('/car', (req, res,next) => { 
   const err =new Error();
   err.status=500
   next(err);
 });
-
-
-// (async ()=>{
-//   console.log('Testing the connection to the database...');
-//   try{
-//     await sequelize.authenticate();
-//     console.log('Connection has been established successfully.');
-//   }
-//   catch(error)
-//   {
-//     console.error('Unable to connect to the database:', error);
-//   }
-// })();
 
 
 // catch 404 and forward to error handler
@@ -190,19 +144,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  // res.locals.message = err.message;
-  // res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  // const newerr=new Error("Internal Server Error");
-  // if(!err.status)
-  // {
-  //   // const err=new Error("Internal Server Error");
-  //   newerr.status =500;
-  //   newerr.message="Sorry! There was an unexpected error on the server.";
-  //   err=newerr;    
-  // }
+  
   console.log(err);
   if (err.status === 404)
   {

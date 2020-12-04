@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  h1= title
+  h1= books.title
   
   form(action=`/books/${books.id}` , method ='post')
     include form
